@@ -23,7 +23,9 @@ func main() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./route-ddns.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ./route-ddns.yaml)")
+
+	viper.SetDefault("cycleTime", 300)
 }
 
 func initConfig() {
@@ -37,7 +39,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		log.Print("Using config file: ", viper.ConfigFileUsed())
 	}
 	viper.Unmarshal(&cfg)
 }
@@ -57,7 +59,7 @@ var rootCmd = &cobra.Command{
 
 		var currentIP = ""
 
-		ticker := time.NewTicker(20 * time.Second)
+		ticker := time.NewTicker(time.Duration(cfg.CycleTime) * time.Second)
 		for ; true; <-ticker.C {
 			var provider = ipProvidersRing.Value.(string)
 			ipProvidersRing = ipProvidersRing.Next()

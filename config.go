@@ -3,6 +3,7 @@ package main
 type Config struct {
 	HostedZones []HostedZone
 	Providers   []string
+	CycleTime   int
 }
 
 type HostedZone struct {
