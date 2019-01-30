@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -14,25 +13,28 @@ import (
 func changeIP(newIP string, cfg Config) error {
 	const maxAttempts = 5
 	err := try.Do(func(attempt int) (bool, error) {
-		sess, err := session.NewSession()
-		if err == nil {
-			svc := route53.New(sess)
-			for _, zone := range cfg.HostedZones {
-				err = processHostedZone(newIP, zone, *svc)
-				if err != nil {
-					break
-				}
-			}
-		}
+		err := tryChangeIP(newIP, cfg)
 		if err != nil {
 			log.Print(fmt.Sprintf("WARNING: Set DNS attempt %v/%v: %v", attempt, maxAttempts, err))
-			if attempt != maxAttempts {
-				time.Sleep(time.Duration(attempt*attempt) * time.Second)
-			}
 		}
 		return attempt < maxAttempts, err
 	})
 	return err
+}
+
+func tryChangeIP(newIP string, cfg Config) error {
+	sess, err := session.NewSession()
+	if err != nil {
+		return err
+	}
+	svc := route53.New(sess)
+	for _, zone := range cfg.HostedZones {
+		err = processHostedZone(newIP, zone, *svc)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func processHostedZone(newIP string, zone HostedZone, svc route53.Route53) error {
