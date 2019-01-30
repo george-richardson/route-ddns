@@ -30,7 +30,7 @@ hostedZones:
           ttl: 60           # TTL to set on the record.
         - name: subdomain.example.com
           recordType: A
-		  ttl: 60
+          ttl: 60
 # (Optional) List of public IP resolvers to use (default: https://api.ipify.org?format=text)
 providers: 
   - "https://api.ipify.org?format=text"
