@@ -11,8 +11,12 @@ import (
 	try "gopkg.in/matryer/try.v1"
 )
 
-func changeIP(newIP string, cfg Config) error {
+func changeIP(newIP string, cfg Config) {
 	const maxAttempts = 5
+	if len(cfg.HostedZones) == 0 {
+		log.Warn("No hosted zones configured.")
+		return
+	}
 	err := try.Do(func(attempt int) (bool, error) {
 		err := tryChangeIP(newIP, cfg)
 		if err != nil {
@@ -23,7 +27,12 @@ func changeIP(newIP string, cfg Config) error {
 		}
 		return attempt < maxAttempts, err
 	})
-	return err
+	if err != nil {
+		log.Error(fmt.Sprintf("Max attempts reached while applying DNS changes"))
+		return
+	}
+	log.Info(fmt.Sprintf("DNS records updated"))
+	return
 }
 
 func tryChangeIP(newIP string, cfg Config) error {

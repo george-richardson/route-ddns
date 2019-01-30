@@ -70,22 +70,20 @@ var rootCmd = &cobra.Command{
 		// Main logic loop
 		ticker := time.NewTicker(time.Duration(cfg.CycleTime) * time.Second)
 		for ; true; <-ticker.C {
+			// Load provider
 			var provider = ipProvidersRing.Value.(string)
 			ipProvidersRing = ipProvidersRing.Next()
-			var resolvedIP, err = resolveIP(provider)
 
+			// Resolve IP
+			var resolvedIP, err = resolveIP(provider)
 			if err != nil {
-				log.Info(fmt.Sprintf("ERROR: Max attempts reached while resolving from %v", provider))
 				continue
 			}
 
+			// Change DNS record if necessary
 			if resolvedIP != currentIP {
 				log.Info(fmt.Sprintf("IP '%v' resolved from '%v' does not match current IP '%v'", resolvedIP, provider, currentIP))
-				err = changeIP(resolvedIP, cfg)
-				if err != nil {
-					log.Error(fmt.Sprintf("Max attempts reached while applying DNS changes"))
-				}
-				log.Info(fmt.Sprintf("DNS records updated"))
+				changeIP(resolvedIP, cfg)
 				currentIP = resolvedIP
 			} else {
 				log.Info(fmt.Sprintf("IP '%v' resolved from '%v' matches current IP '%v'", resolvedIP, provider, currentIP))

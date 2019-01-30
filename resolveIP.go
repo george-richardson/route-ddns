@@ -26,7 +26,9 @@ func resolveIP(provider string) (string, error) {
 		}
 		return attempt < maxAttempts, err
 	})
-
+	if err != nil {
+		log.Error(fmt.Sprintf("Max attempts reached while resolving IP from %v", provider))
+	}
 	return resolvedIP, err
 }
 
