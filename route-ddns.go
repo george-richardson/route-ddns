@@ -23,24 +23,32 @@ func main() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+
+	// CLI
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ./route-ddns.yaml)")
 
+	// Set config defaults
 	viper.SetDefault("cycleTime", 300)
+	viper.SetDefault("providers", []string{"https://api.ipify.org?format=text"})
 }
 
 func initConfig() {
+	// Setup config file location
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		viper.AddConfigPath(".")
 		viper.SetConfigName("route-ddns")
 	}
-
+	// Setup ENV configuration
 	viper.AutomaticEnv()
 
+	// Read config file
 	if err := viper.ReadInConfig(); err == nil {
 		log.Print("Using config file: ", viper.ConfigFileUsed())
 	}
+
+	// Marshall config file to Config struct
 	viper.Unmarshal(&cfg)
 }
 
