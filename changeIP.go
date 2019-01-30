@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/route53"
+	log "github.com/sirupsen/logrus"
 	try "gopkg.in/matryer/try.v1"
 )
 
@@ -15,7 +16,10 @@ func changeIP(newIP string, cfg Config) error {
 	err := try.Do(func(attempt int) (bool, error) {
 		err := tryChangeIP(newIP, cfg)
 		if err != nil {
-			log.Print(fmt.Sprintf("WARNING: Set DNS attempt %v/%v: %v", attempt, maxAttempts, err))
+			log.Warn(fmt.Sprintf("Set DNS attempt %v/%v: %v", attempt, maxAttempts, err))
+			if attempt != maxAttempts {
+				time.Sleep(time.Duration(attempt*attempt) * time.Second)
+			}
 		}
 		return attempt < maxAttempts, err
 	})

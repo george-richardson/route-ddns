@@ -6,7 +6,9 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
+	log "github.com/sirupsen/logrus"
 	try "gopkg.in/matryer/try.v1"
 )
 
@@ -16,6 +18,12 @@ func resolveIP(provider string) (string, error) {
 	err := try.Do(func(attempt int) (bool, error) {
 		var err error
 		resolvedIP, err = tryResolveIP(provider)
+		if err != nil {
+			log.Warn(fmt.Sprintf("Resolve IP attempt %v/%v: %v", attempt, maxAttempts, err))
+			if attempt != maxAttempts {
+				time.Sleep(time.Duration(attempt*attempt) * time.Second)
+			}
+		}
 		return attempt < maxAttempts, err
 	})
 

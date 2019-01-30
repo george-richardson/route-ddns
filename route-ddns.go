@@ -3,10 +3,10 @@ package main
 import (
 	"container/ring"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -75,20 +75,20 @@ var rootCmd = &cobra.Command{
 			var resolvedIP, err = resolveIP(provider)
 
 			if err != nil {
-				log.Print(fmt.Sprintf("ERROR: Max attempts reached while resolving from %v", provider))
+				log.Info(fmt.Sprintf("ERROR: Max attempts reached while resolving from %v", provider))
 				continue
 			}
 
 			if resolvedIP != currentIP {
-				log.Print(fmt.Sprintf("IP '%v' resolved from '%v' does not match current IP '%v'", resolvedIP, provider, currentIP))
+				log.Info(fmt.Sprintf("IP '%v' resolved from '%v' does not match current IP '%v'", resolvedIP, provider, currentIP))
 				err = changeIP(resolvedIP, cfg)
 				if err != nil {
-					log.Print(fmt.Sprintf("ERROR: Max attempts reached while applying DNS changes"))
+					log.Error(fmt.Sprintf("Max attempts reached while applying DNS changes"))
 				}
-				log.Print(fmt.Sprintf("DNS records updated"))
+				log.Info(fmt.Sprintf("DNS records updated"))
 				currentIP = resolvedIP
 			} else {
-				log.Print(fmt.Sprintf("IP '%v' resolved from '%v' matches current IP '%v'", resolvedIP, provider, currentIP))
+				log.Info(fmt.Sprintf("IP '%v' resolved from '%v' matches current IP '%v'", resolvedIP, provider, currentIP))
 			}
 		}
 	},
