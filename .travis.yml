@@ -1,0 +1,17 @@
+language: go
+go:
+  - "1.11"
+env: 
+  - GO111MODULE=on
+script: 
+  - "go build -o route-ddns"
+  - "GOARCH=amd64 GOOS=windows go build -o route-ddns.exe"
+deploy:
+  provider: releases
+  api_key: $GITHUB_API_KEY
+  file: 
+    - route-ddns.exe
+    - route-ddns
+  skip_cleanup: true
+  on:
+    tags: true

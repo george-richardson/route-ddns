@@ -1,3 +1,10 @@
+# Install
+
+Grab a [release](https://github.com/george-richardson/route-ddns/releases) or run:
+```
+go get github.com/george-richardson/route-ddns
+```
+
 # Usage
 ```
 route-ddns is a ddns client that updates record sets in AWS route53 when an IP change is detected.
