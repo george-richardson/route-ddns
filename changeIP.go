@@ -38,6 +38,7 @@ func tryChangeIP(newIP string, cfg Config) error {
 }
 
 func processHostedZone(newIP string, zone HostedZone, svc route53.Route53) error {
+	// Update all records in Route53 hostedzone
 	var inputRecords []*route53.Change
 	for _, record := range zone.Records {
 		inputRecords = append(inputRecords, &route53.Change{

@@ -67,6 +67,7 @@ var rootCmd = &cobra.Command{
 
 		var currentIP = ""
 
+		// Main logic loop
 		ticker := time.NewTicker(time.Duration(cfg.CycleTime) * time.Second)
 		for ; true; <-ticker.C {
 			var provider = ipProvidersRing.Value.(string)
