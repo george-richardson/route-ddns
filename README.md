@@ -1,9 +1,8 @@
 # Install
-
-Grab a [release](https://github.com/george-richardson/route-ddns/releases) or run:
-```
-go get github.com/george-richardson/route-ddns
-```
+There are a few ways to get route-ddns:
+1. Grab a [release](https://github.com/george-richardson/route-ddns/releases) executable. 
+2. Run `go get github.com/george-richardson/route-ddns` to install on GOPATH.
+3. Pull the docker image with `docker pull georgerichardson/route-ddns`. 
 
 # Usage
 ```
@@ -18,6 +17,15 @@ Flags:
 ```
 
 You must provide a valid config file as described below. AWS must be configured with a default profile or through environment variables as described in the [official AWS documentation](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
+
+If running on Docker you should add your config file as a volume. You will also need to configure your AWS credentials as environment variables on the container.
+```
+docker run -v route-ddns.yml:/route-ddns.yml \
+  -e AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE \
+  -e AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY \
+  -e AWS_DEFAULT_REGION=us-west-2 \
+  georgerichardson/route-ddns 
+```
 
 ## Example Config
 ```yaml

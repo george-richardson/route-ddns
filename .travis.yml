@@ -1,17 +1,32 @@
 language: go
 go:
   - "1.11"
+services:
+  - docker
 env: 
   - GO111MODULE=on
 script: 
   - "go build -o route-ddns"
+  - "chmod 775 route-ddns"
   - "GOARCH=amd64 GOOS=windows go build -o route-ddns.exe"
+  - "docker build . -t georgerichardson/route-ddns"
 deploy:
-  provider: releases
-  api_key: $GITHUB_API_KEY
-  file: 
-    - route-ddns.exe
-    - route-ddns
-  skip_cleanup: true
-  on:
-    tags: true
+  - provider: releases
+    skip_cleanup: true
+    on:
+      tags: true
+    api_key: $GITHUB_API_KEY
+    file: 
+      - route-ddns.exe
+      - route-ddns
+  - provider: script
+    skip_cleanup: true
+    on:
+      tags: true
+    script: >
+      set -x; 
+      docker tag georgerichardson/route-ddns georgerichardson/route-ddns:$TRAVIS_TAG &&
+      docker tag georgerichardson/route-ddns georgerichardson/route-ddns:latest &&
+      (echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin) &&
+      docker push georgerichardson/route-ddns:$TRAVIS_TAG &&
+      docker push georgerichardson/route-ddns:latest
